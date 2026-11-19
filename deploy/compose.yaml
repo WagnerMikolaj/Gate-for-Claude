@@ -1,0 +1,62 @@
+services:
+  gate:
+    build: ..
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      GATE_HOST: 0.0.0.0
+      GATE_TENANTS_FILE: /config/tenants.json
+      GATE_AUDIT_DB: /app/data/audit.db
+      NODE_USE_ENV_PROXY: '1'
+      HTTPS_PROXY: http://egress:3128
+      HTTP_PROXY: http://egress:3128
+      NO_PROXY: ''
+    volumes:
+      - ../tenants.local.json:/config/tenants.json:ro
+      - audit:/app/data
+    networks: [isolated]
+    read_only: true
+    tmpfs: [/tmp:size=16m,noexec,nosuid]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 100
+    mem_limit: 256m
+    healthcheck:
+      test: [CMD, node, -e, "const net=require('net'); const s=net.connect(8080,'127.0.0.1',()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1));setTimeout(()=>process.exit(1),2000)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  edge:
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    depends_on: [gate]
+    ports: ['443:443']
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./tls:/etc/nginx/tls:ro
+    networks: [isolated, edge]
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 100
+    mem_limit: 128m
+  egress:
+    build:
+      context: .
+      dockerfile: Squid.Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./gateway-egress.conf:/etc/squid/squid.conf:ro
+    networks: [isolated, outbound]
+    read_only: true
+    tmpfs: [/var/log/squid, /var/spool/squid, /run, /tmp]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 100
+    mem_limit: 128m
+networks:
+  isolated:
+    internal: true
+  edge: {}
+  outbound: {}
+volumes:
+  audit: {}

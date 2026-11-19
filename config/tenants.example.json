@@ -1,0 +1,50 @@
+{
+  "tenants": [
+    {
+      "id": "acme",
+      "name": "ACME",
+      "oidc": {
+        "issuer": "https://login.microsoftonline.com/11111111-1111-4111-8111-111111111111/v2.0",
+        "clientId": "replace-with-acme-client-id",
+        "clientSecretEnv": "ACME_OIDC_SECRET",
+        "tenantClaim": "tid",
+        "tenantValue": "11111111-1111-4111-8111-111111111111",
+        "rolesClaim": "roles",
+        "userRole": "Gate.User",
+        "adminRole": "Gate.Admin"
+      },
+      "provider": {
+        "apiKeyEnv": "ACME_ANTHROPIC_KEY",
+        "orgIds": ["22222222-2222-4222-8222-222222222222"],
+        "model": "claude-sonnet-4-6"
+      },
+      "policy": {
+        "blockedTerms": ["poufne", "tajemnica przedsiębiorstwa", "confidential", "strictly internal"],
+        "requestsPerMinute": 10
+      }
+    },
+    {
+      "id": "beta",
+      "name": "BETA",
+      "oidc": {
+        "issuer": "https://login.microsoftonline.com/33333333-3333-4333-8333-333333333333/v2.0",
+        "clientId": "replace-with-beta-client-id",
+        "clientSecretEnv": "BETA_OIDC_SECRET",
+        "tenantClaim": "tid",
+        "tenantValue": "33333333-3333-4333-8333-333333333333",
+        "rolesClaim": "roles",
+        "userRole": "Gate.User",
+        "adminRole": "Gate.Admin"
+      },
+      "provider": {
+        "apiKeyEnv": "BETA_ANTHROPIC_KEY",
+        "orgIds": ["44444444-4444-4444-8444-444444444444"],
+        "model": "claude-sonnet-4-6"
+      },
+      "policy": {
+        "blockedTerms": ["poufne", "confidential", "projekt orion"],
+        "requestsPerMinute": 10
+      }
+    }
+  ]
+}

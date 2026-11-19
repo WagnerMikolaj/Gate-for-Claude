@@ -1,0 +1,14 @@
+{
+  "name": "corporate-ai-gate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.14.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/main.mjs",
+    "demo": "node src/main.mjs --demo",
+    "test": "node --test --test-concurrency=1",
+    "check": "node --check src/server.mjs && node --check src/auth.mjs && node --check public/app.js"
+  },
+  "dependencies": { "openid-client": "^6.8.1" }
+}

@@ -1,0 +1,18 @@
+# Separate, dedicated explicit proxy for an isolated AI workstation/VDI segment.
+# Replace the network and host. Enforce routing at the FIREWALL; PAC alone is bypassable.
+# SSO browser endpoints require an environment-specific explicit allowlist.
+# This is a restrictive AI segment profile, not a drop-in policy for general web browsing.
+http_port 3128
+acl managed_clients src 10.80.0.0/16
+acl CONNECT method CONNECT
+acl TLS_ports port 443
+acl gate dstdomain gate.company.example
+acl corporate_idp dstdomain login.microsoftonline.com .msauth.net .msftauth.net
+http_access deny !managed_clients
+http_access deny !CONNECT
+http_access deny !TLS_ports
+http_access allow gate
+http_access allow corporate_idp
+http_access deny all
+cache deny all
+access_log none
